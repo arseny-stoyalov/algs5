@@ -4,9 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
-import static java.lang.Math.*;
+import static java.lang.Math.pow;
 
 public class HCView {
 
@@ -102,18 +101,6 @@ public class HCView {
             displayImage.clearImage();
             displayImage.repaint();
         }
-    }
-
-    private List<Point> recursiveHilbert(int order) {
-        return null;
-    }
-
-    private List<Point> generatePart() {
-        return null;
-    }
-
-    private List<Point> rotate(List<Point> points) {
-        return null;
     }
 
     private Point hilbertPoint(int i) {
