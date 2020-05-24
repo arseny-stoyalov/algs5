@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,17 +15,23 @@ public class HCView {
 
     private final CurveImageDisplay displayImage;
 
+    private final JLabel txtTime;
+
     private Integer order = 7;
 
     public HCView() {
         displayImage = new CurveImageDisplay();
+        txtTime = new JLabel();
+        txtTime.setPreferredSize(new Dimension(100, 15));
     }
 
     public void start() {
 
         JFrame frame = new JFrame("Hilbert's Curve");
-        JButton btnStart = new JButton("Start/Stop");
+        JButton btnStart = new JButton("Animate");
         JPanel top = new JPanel();
+        JPanel bottom = new JPanel();
+        JLabel lblTime = new JLabel("Time:");
         JLabel label = new JLabel("Order:");
         JComboBox<Integer> comboBox = new JComboBox<>();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,19 +39,23 @@ public class HCView {
         top.add(label);
         top.add(comboBox);
 
+        bottom.add(lblTime);
+        bottom.add(txtTime);
+        bottom.add(btnStart);
+
         frame.add(top, BorderLayout.NORTH);
         frame.add(displayImage, BorderLayout.CENTER);
-        frame.add(btnStart, BorderLayout.SOUTH);
+        frame.add(bottom, BorderLayout.SOUTH);
 
         ButtonEventListener btnListener = new ButtonEventListener();
         for (int i = 7; i > 0; i--)
             comboBox.addItem(i);
         comboBox.addActionListener(e -> {
-            if (btnListener.btnPressed) {
+            if (btnListener.btnPressed)
                 btnStart.doClick();
-                displayImage.clearImage();
-            }
+            displayImage.clearImage();
             setOrder((Integer) comboBox.getSelectedItem());
+            drawCurve(false);
         });
         btnStart.addActionListener(btnListener);
 
@@ -52,6 +63,7 @@ public class HCView {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.setResizable(false);
+        drawCurve(false);
     }
 
     private class ButtonEventListener implements ActionListener {
@@ -64,7 +76,7 @@ public class HCView {
         public void actionPerformed(ActionEvent e) {
 
             if (!btnPressed) {
-                Thread t = new Thread(HCView.this::drawCurve);
+                Thread t = new Thread(() -> drawCurve(true));
                 threadId = t.getId();
                 t.setDaemon(true);
                 t.start();
@@ -77,20 +89,26 @@ public class HCView {
 
     }
 
-    private void drawCurve() {
+    private void drawCurve(boolean animate) {
 
+        long start = LocalDateTime.now().getNano();
         int n = (int) pow(2, order);
-        int total = n * n;
         int lineLength = displayImage.getWidth() / n;
         List<Point> points = recursiveHilbert(order);
         for (Point point : points) {
             point.x = point.x * lineLength + lineLength / 2;
             point.y = point.y * lineLength + lineLength / 2;
         }
-        connectPoints(points);
+        if (animate)
+            animateConnection(points);
+        else {
+            connectPoints(points);
+            long end = LocalDateTime.now().getNano();
+            txtTime.setText(end - start + " ns");
+        }
     }
 
-    private void connectPoints(List<Point> points) {
+    private void animateConnection(List<Point> points) {
 
         try {
             while (true) {
@@ -103,6 +121,13 @@ public class HCView {
             }
         } catch (InterruptedException ignored) {
         }
+    }
+
+    private void connectPoints(List<Point> points) {
+
+        for (int i = 0; i < points.size() - 1; i++)
+            displayImage.drawLine(points.get(i), points.get(i + 1));
+        displayImage.repaint();
     }
 
     private List<Point> recursiveHilbert(int order) {
