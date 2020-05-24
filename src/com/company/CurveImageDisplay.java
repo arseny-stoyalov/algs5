@@ -40,13 +40,13 @@ public class CurveImageDisplay extends JComponent {
         image.setRGB(p.x, p.y, color);
     }
 
-    public void clearImage(){
+    public void clearImage() {
         Graphics2D g = image.createGraphics();
         g.setPaint(Color.WHITE);
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
     }
 
-    public void drawLine(Point first, Point second){
+    public void drawLine(Point first, Point second) {
         Graphics2D g = (Graphics2D) image.getGraphics();
         g.setPaint(Color.BLACK);
         g.drawLine(first.x, first.y, second.x, second.y);
