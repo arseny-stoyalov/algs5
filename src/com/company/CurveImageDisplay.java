@@ -6,8 +6,8 @@ import java.awt.image.BufferedImage;
 
 public class CurveImageDisplay extends JComponent {
 
-    private static final int DEFAULT_WIDTH = 512;
-    private static final int DEFAULT_HEIGHT = 512;
+    private static final int DEFAULT_WIDTH = 515;
+    private static final int DEFAULT_HEIGHT = 515;
 
     private final BufferedImage image;
 

@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +16,7 @@ public class HCView {
 
     private final JLabel txtTime;
 
-    private Integer order = 7;
+    private Integer order = 1;
 
     public HCView() {
         displayImage = new CurveImageDisplay();
@@ -48,7 +47,7 @@ public class HCView {
         frame.add(bottom, BorderLayout.SOUTH);
 
         ButtonEventListener btnListener = new ButtonEventListener();
-        for (int i = 7; i > 0; i--)
+        for (int i = 1; i < 10; i++)
             comboBox.addItem(i);
         comboBox.addActionListener(e -> {
             if (btnListener.btnPressed)
@@ -83,6 +82,7 @@ public class HCView {
             } else {
                 for (Thread thread : Thread.getAllStackTraces().keySet())
                     if (thread.getId() == threadId) thread.interrupt();
+                drawCurve(false);
             }
             btnPressed = !btnPressed;
         }
@@ -91,7 +91,7 @@ public class HCView {
 
     private void drawCurve(boolean animate) {
 
-        long start = LocalDateTime.now().getNano();
+        long start = System.nanoTime();
         int n = (int) pow(2, order);
         int lineLength = displayImage.getWidth() / n;
         List<Point> points = recursiveHilbert(order);
@@ -103,7 +103,7 @@ public class HCView {
             animateConnection(points);
         else {
             connectPoints(points);
-            long end = LocalDateTime.now().getNano();
+            long end = System.nanoTime();
             txtTime.setText(end - start + " ns");
         }
     }
